@@ -13,7 +13,7 @@
 <script lang="ts">
 import Post from './components/Post.vue'
 import store from './store'
-import { defineComponent, ref, onMounted, computed } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue'
 
 export default defineComponent({
   name: 'App',
@@ -23,12 +23,13 @@ export default defineComponent({
   setup () {
     // data
     const page = ref(1)
+    const post = ref()
     // methods
     const loadPage = async () => {
-      await store.dispatch('getPost', page.value)
+      post.value = await store.dispatch('getPost', page.value)
     }
     const prevPost = async () => {
-      if (page.value !== 1) {
+      if (page.value > 1) {
         page.value--
         await loadPage()
       }
@@ -37,13 +38,6 @@ export default defineComponent({
       page.value++
       await loadPage()
     }
-    // computed
-    const post = computed(() => {
-      return store.state.posts[page.value - 1]
-    })
-    const isDisabled = computed(() => {
-      return page.value === 1
-    })
     // mounted
     onMounted(async () => {
       await loadPage()
@@ -52,8 +46,7 @@ export default defineComponent({
       page,
       post,
       prevPost,
-      nextPost,
-      isDisabled
+      nextPost
     }
   }
 })
